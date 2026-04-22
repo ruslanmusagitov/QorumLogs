@@ -64,19 +64,28 @@ System logs are white (or black) after all, yours are not :)
 ![demo](http://i.imgur.com/rJKInKk.png)
 
 ## Installation
+### Install via Swift Package Manager (SPM) (Recommended)
 
-### Prerequisites
+In Xcode: **File → Add Packages…** and add this repository URL.
 
-1. If you don't have [Alcatraz](https://github.com/supermarin/Alcatraz) or [XcodeColors](https://github.com/robbiehanson/XcodeColors) installed, lets install them.
-Open up your terminal and paste this:
+Or in your app’s `Package.swift`:
 
-  ``` bash
-curl -fsSL https://raw.github.com/supermarin/Alcatraz/master/Scripts/install.sh | sh
-   ```
-2. Restart Xcode after the installation
-3. Alcatraz requires Xcode Command Line Tools, which can be installed in Xcode > Preferences > Downloads. (You might not need this in the latest Xcode version)
-4. In Xcode click Window > Package Manager, type in 'XcodeColors' in the search bar. Click Install.
-5. Restart Xcode after the installation
+```swift
+dependencies: [
+    .package(url: "https://github.com/goktugyil/QorumLogs.git", from: "0.9.0")
+]
+```
+
+Then add the product to your target:
+
+```swift
+targets: [
+    .target(
+        name: "MyApp",
+        dependencies: ["QorumLogs"]
+    )
+]
+```
 
 ### Install via Cocoapods
 
@@ -85,15 +94,9 @@ You can use [Cocoapods](http://cocoapods.org/) to install `QorumLogs` by adding 
 platform :ios, '8.0' # platform :tvos, '9.0' (for tvOS)
 use_frameworks!
 
-pod 'QorumLogs' #Stable release for Swift 3.0
-
-pod 'QorumLogs', :git => 'https://github.com/goktugyil/QorumLogs.git' #Latest release for Swift 3.0
-pod 'QorumLogs', :git => 'https://github.com/goktugyil/QorumLogs.git', :branch => 'Swift2.3' #For Swift 2.3
-pod 'QorumLogs', '~> 0.8' #For Swift 2.2
+pod 'QorumLogs'
 
 ```
-
-(Cocoapods forces you to import the framework in every file. If anyone has a solution or workaround, inform me please)
 
 ### Install via Carthage
 
@@ -101,18 +104,6 @@ You can install `QorumLogs` via [Carthage](https://github.com/Carthage/Carthage)
 
 ```
 github "goktugyil/QorumLogs"
-```
-
-### Install via Swift Package Manager (SPM)
-
-In Xcode: **File → Add Packages…** and add this repository URL.
-
-Or in `Package.swift`:
-
-```swift
-dependencies: [
-    .package(url: "https://github.com/goktugyil/QorumLogs.git", from: "0.9.0")
-]
 ```
 
 ### Install Manually
@@ -207,9 +198,10 @@ Unfortunately you can't just select the rows inside Google Docs and delete them.
 
 ## Requirements
 
-- Xcode 6 or later (Tested on 6.4)
-- iOS 7 or later (Tested on 7.1)
-- tvOS 9 or later
+- Xcode 13+ / Swift 5.5+
+- iOS 8.0+
+- tvOS 9.0+
+- macOS 10.10+
 
 ## Possible features
 
@@ -221,7 +213,6 @@ Unfortunately you can't just select the rows inside Google Docs and delete them.
 - Pod support with QL methods written customly
 
 ## Thanks for making this possible
-- [XcodeColors](https://github.com/robbiehanson/XcodeColors)
 - [Magic](https://github.com/ArtSabintsev/Magic)
 
 
