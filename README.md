@@ -103,6 +103,18 @@ You can install `QorumLogs` via [Carthage](https://github.com/Carthage/Carthage)
 github "goktugyil/QorumLogs"
 ```
 
+### Install via Swift Package Manager (SPM)
+
+In Xcode: **File → Add Packages…** and add this repository URL.
+
+Or in `Package.swift`:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/goktugyil/QorumLogs.git", from: "0.9.0")
+]
+```
+
 ### Install Manually
 
 Download and drop 'QorumLogs.swift' in your project.
