@@ -166,6 +166,12 @@ You do not need the extension of the file.
 
 #### Add Custom Colors
 
+Apply a palette tuned for your Xcode console theme:
+```swift
+    QorumLogs.applyColorTheme(.xcodeLight)
+    QorumLogs.applyColorTheme(.xcodeDark)
+```
+
 Add custom colors for Mac, iOS, tvOS:
 ```swift
     QorumLogs.colorsForLogLevels[0] = QLColor(r: 255, g: 255, b: 0)

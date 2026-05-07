@@ -19,6 +19,34 @@ private let kLogInfo = "Info"
 private let kLogWarning = "Warning"
 private let kLogError = "Error"
 
+public enum QorumLogColorTheme {
+    case xcodeLight
+    case xcodeDark
+
+    public var colors: [QLColor] {
+        switch self {
+        case .xcodeLight:
+            return [
+                QLColor(r: 80, g: 80, b: 80),
+                QLColor(r: 0, g: 95, b: 180),
+                QLColor(r: 0, g: 135, b: 60),
+                QLColor(r: 190, g: 120, b: 0),
+                QLColor(r: 210, g: 30, b: 30),
+                QLColor(r: 145, g: 65, b: 190)
+            ]
+        case .xcodeDark:
+            return [
+                QLColor(r: 170, g: 170, b: 170),
+                QLColor(r: 80, g: 220, b: 255),
+                QLColor(r: 90, g: 230, b: 120),
+                QLColor(r: 255, g: 210, b: 80),
+                QLColor(r: 255, g: 95, b: 95),
+                QLColor(r: 210, g: 140, b: 255)
+            ]
+        }
+    }
+}
+
 public struct QorumLogs {
 
     /// While enabled QorumOnlineLogs does not work.
@@ -65,6 +93,10 @@ public struct QorumLogs {
 
     /// Uses ANSI colors instead of colors or emojis when this is true.
     nonisolated(unsafe) public static var useAnsiColors = false
+
+    public static func applyColorTheme(_ theme: QorumLogColorTheme) {
+        colorsForLogLevels = theme.colors
+    }
 
     /// Set your function that will get called whenever something new is logged.
     nonisolated(unsafe) public static var trackLogFunction: ((String) -> Void)?
