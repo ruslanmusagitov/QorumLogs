@@ -24,10 +24,15 @@ let package = Package(
                 "LICENSE",
                 "README.md",
                 "Log To GoogleDocs.md",
-                "QorumLogs.podspec"
+                "QorumLogs.podspec",
+                "Tests"
             ],
             sources: ["QorumLogs.swift"]
+        ),
+        .testTarget(
+            name: "QorumLogsTests",
+            dependencies: ["QorumLogs"],
+            path: "Tests/QorumLogsTests"
         )
     ]
 )
-

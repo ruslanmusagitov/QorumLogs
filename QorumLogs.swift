@@ -125,12 +125,21 @@ private let kOnlineLogError = "4Error"
 
 public struct QorumOnlineLogs {
 
+    struct GoogleFormFields {
+        let appVersionField: String
+        let userInfoField: String
+        let methodInfoField: String
+        let errorTextField: String
+    }
+
     private static let appVersion = versionAndBuild()
     nonisolated(unsafe) private static var googleFormLink: String?
-    nonisolated(unsafe) private static var googleFormAppVersionField: String?
-    nonisolated(unsafe) private static var googleFormUserInfoField: String?
-    nonisolated(unsafe) private static var googleFormMethodInfoField: String?
-    nonisolated(unsafe) private static var googleFormErrorTextField: String?
+    nonisolated(unsafe) private static var googleFormFields: GoogleFormFields?
+    nonisolated(unsafe) private static var isResolvingGoogleFormFields = false
+
+    static var currentGoogleFormLink: String? {
+        googleFormLink
+    }
 
     /// Online logs does not work while QorumLogs is enabled.
     nonisolated(unsafe) public static var enabled = false
@@ -160,22 +169,30 @@ public struct QorumOnlineLogs {
         methodInfoField: String,
         textField: String
     ) {
-        googleFormLink = formLink
-        googleFormAppVersionField = versionField
-        googleFormUserInfoField = userInfoField
-        googleFormMethodInfoField = methodInfoField
-        googleFormErrorTextField = textField
+        googleFormLink = normalizedFormResponseLink(from: formLink)
+        googleFormFields = GoogleFormFields(
+            appVersionField: versionField,
+            userInfoField: userInfoField,
+            methodInfoField: methodInfoField,
+            errorTextField: textField
+        )
+    }
+
+    /// Setup Google Form and automatically resolve first four `entry.*` field names.
+    /// Field order: app version, user info, method info, log text.
+    public static func setupOnlineLogs(formLink: String) {
+        googleFormLink = normalizedFormResponseLink(from: formLink)
+        googleFormFields = nil
+        resolveGoogleFormFieldsIfNeeded()
     }
 
     fileprivate static func sendError(classInformation: String, text: String, level: String) {
         guard
             let formLink = googleFormLink,
-            let appVersionField = googleFormAppVersionField,
-            let userInfoField = googleFormUserInfoField,
-            let methodInfoField = googleFormMethodInfoField,
-            let errorTextField = googleFormErrorTextField,
+            let fields = googleFormFields,
             let url = URL(string: formLink)
         else {
+            resolveGoogleFormFieldsIfNeeded()
             return
         }
 
@@ -184,10 +201,10 @@ public struct QorumOnlineLogs {
 
         var components = URLComponents()
         components.queryItems = [
-            URLQueryItem(name: appVersionField, value: versionLevel),
-            URLQueryItem(name: userInfoField, value: userInfo),
-            URLQueryItem(name: methodInfoField, value: classInformation),
-            URLQueryItem(name: errorTextField, value: text)
+            URLQueryItem(name: fields.appVersionField, value: versionLevel),
+            URLQueryItem(name: fields.userInfoField, value: userInfo),
+            URLQueryItem(name: fields.methodInfoField, value: classInformation),
+            URLQueryItem(name: fields.errorTextField, value: text)
         ]
 
         var request = URLRequest(url: url)
@@ -206,6 +223,76 @@ public struct QorumOnlineLogs {
             return false
         }
         return QorumLogs.shouldShowFile(fileName)
+    }
+
+    private static func resolveGoogleFormFieldsIfNeeded() {
+        guard !isResolvingGoogleFormFields, googleFormFields == nil else {
+            return
+        }
+        guard let formLink = googleFormLink else {
+            return
+        }
+        guard let url = URL(string: normalizedViewFormLink(from: formLink)) else {
+            return
+        }
+
+        isResolvingGoogleFormFields = true
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            defer { isResolvingGoogleFormFields = false }
+            guard let data, let html = String(data: data, encoding: .utf8) else {
+                return
+            }
+            googleFormFields = extractGoogleFormFields(from: html)
+        }.resume()
+    }
+
+    private static func normalizedFormResponseLink(from formLink: String) -> String {
+        formLink
+            .replacingOccurrences(of: "/viewform", with: "/formResponse")
+            .replacingOccurrences(of: "/viewForm", with: "/formResponse")
+    }
+
+    private static func normalizedViewFormLink(from formLink: String) -> String {
+        formLink
+            .replacingOccurrences(of: "/formResponse", with: "/viewform")
+            .replacingOccurrences(of: "/formresponse", with: "/viewform")
+    }
+
+    static func extractGoogleFormFields(from html: String) -> GoogleFormFields? {
+        let pattern = "name\\s*=\\s*\"(entry(?:\\.|_)\\d+)\""
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+            return nil
+        }
+
+        let nsHTML = html as NSString
+        let matches = regex.matches(in: html, options: [], range: NSRange(location: 0, length: nsHTML.length))
+        guard !matches.isEmpty else {
+            return nil
+        }
+
+        var uniqueNames: [String] = []
+        uniqueNames.reserveCapacity(4)
+        for match in matches {
+            guard match.numberOfRanges > 1 else { continue }
+            let value = nsHTML.substring(with: match.range(at: 1))
+            if !uniqueNames.contains(value) {
+                uniqueNames.append(value)
+                if uniqueNames.count == 4 {
+                    break
+                }
+            }
+        }
+
+        guard uniqueNames.count >= 4 else {
+            return nil
+        }
+
+        return GoogleFormFields(
+            appVersionField: uniqueNames[0],
+            userInfoField: uniqueNames[1],
+            methodInfoField: uniqueNames[2],
+            errorTextField: uniqueNames[3]
+        )
     }
 }
 

@@ -16,6 +16,16 @@ versionField: <#String#>, userInfoField: <#String#>, methodInfoField: <#String#>
   ```
 With one difference: change "viewform" to "formResponse".
 
+You can now skip manual field ids and let QorumLogs resolve them automatically:
+```swift
+QorumOnlineLogs.setupOnlineLogs(formLink: "https://docs.google.com/forms/d/19MbGnGA54cj9nobK5FxvRNcXJ-Gtudb_xSA3VChzSxU/viewform")
+```
+This automatically picks the first four `entry.*` fields in this order:
+1. App Version
+2. User Information
+3. Code Information
+4. Log Text
+
 7. Go back to your live form, under App Version, select the text field, right click and select "Inspect Element" (I am using Chrome, might be different in your browser) 
 
     ![demo](http://i.imgur.com/KvMBISU.png)
