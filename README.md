@@ -188,6 +188,12 @@ Add custom colors for Mac, iOS, tvOS:
 
 You only need to set the extraInformation one time.
 
+If you need Google Docs rows to be readable in the exact order logs were generated, enable sequence numbers:
+```swift
+   QorumOnlineLogs.includeSequenceNumber = true
+```
+Each online log text will be prefixed with `#1`, `#2`, and so on.
+
 #### KZLinkedConsole support:
 KZLinkedConsole is a plugin for Xcode which add clickable link to place in code from log was printed. All you need to do is install it. For more information go to https://github.com/krzysztofzablocki/KZLinkedConsole  
 

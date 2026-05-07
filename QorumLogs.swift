@@ -141,6 +141,10 @@ public struct QorumOnlineLogs {
     /// Empty dictionary, add extra info like user id, username here.
     nonisolated(unsafe) public static var extraInformation: [String: String] = [:]
 
+    /// Prefixes online log text with a monotonic number so Google Docs can be read or sorted in exact log order.
+    nonisolated(unsafe) public static var includeSequenceNumber = false
+    nonisolated(unsafe) private static var sequenceNumber = 0
+
     /// Test to see if it works.
     public static func test() {
         let oldDebugLevel = minimumLogLevelShown
@@ -181,13 +185,14 @@ public struct QorumOnlineLogs {
 
         let versionLevel = "\(appVersion) - \(level)"
         let userInfo = extraInformation.description
+        let orderedText = orderedLogText(text)
 
         var components = URLComponents()
         components.queryItems = [
             URLQueryItem(name: appVersionField, value: versionLevel),
             URLQueryItem(name: userInfoField, value: userInfo),
             URLQueryItem(name: methodInfoField, value: classInformation),
-            URLQueryItem(name: errorTextField, value: text)
+            URLQueryItem(name: errorTextField, value: orderedText)
         ]
 
         var request = URLRequest(url: url)
@@ -197,7 +202,7 @@ public struct QorumOnlineLogs {
 
         URLSession.shared.dataTask(with: request).resume()
 
-        let printText = "OnlineLogs: \(userInfo) - \(versionLevel) - \(classInformation) - \(text)"
+        let printText = "OnlineLogs: \(userInfo) - \(versionLevel) - \(classInformation) - \(orderedText)"
         print(" \(ColorLog.colorizeString(printText, colorId: 5))\n", terminator: "")
     }
 
@@ -206,6 +211,18 @@ public struct QorumOnlineLogs {
             return false
         }
         return QorumLogs.shouldShowFile(fileName)
+    }
+
+    static func orderedLogText(_ text: String) -> String {
+        guard includeSequenceNumber else {
+            return text
+        }
+        sequenceNumber += 1
+        return "#\(sequenceNumber) \(text)"
+    }
+
+    public static func resetSequenceNumber() {
+        sequenceNumber = 0
     }
 }
 
