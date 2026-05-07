@@ -223,3 +223,4 @@ xcuserdata/
 
 Carthage/Build
 .build
+.swiftpm
