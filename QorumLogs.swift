@@ -19,6 +19,32 @@ private let kLogInfo = "Info"
 private let kLogWarning = "Warning"
 private let kLogError = "Error"
 
+public enum QorumLogLevel {
+    case infoColor
+    case debug
+    case info
+    case warning
+    case error
+    case line
+
+    public var colorIndex: Int {
+        switch self {
+        case .infoColor:
+            return 0
+        case .debug:
+            return 1
+        case .info:
+            return 2
+        case .warning:
+            return 3
+        case .error:
+            return 4
+        case .line:
+            return 5
+        }
+    }
+}
+
 public struct QorumLogs {
 
     /// While enabled QorumOnlineLogs does not work.
@@ -37,6 +63,17 @@ public struct QorumLogs {
         QLColor(r: 255, g: 0, b: 0),     // 4
         QLColor(r: 160, g: 32, b: 240)   // 5
     ]
+
+    private static var defaultColorsForLogLevels: [QLColor] {
+        [
+            QLColor(r: 120, g: 120, b: 120),
+            QLColor(r: 0, g: 180, b: 180),
+            QLColor(r: 0, g: 150, b: 0),
+            QLColor(r: 255, g: 190, b: 0),
+            QLColor(r: 255, g: 0, b: 0),
+            QLColor(r: 160, g: 32, b: 240)
+        ]
+    }
 
     /// Change the array element with another ANSI color.
     /// 0 is info gray, 5 is purple, rest are log levels.
@@ -65,6 +102,18 @@ public struct QorumLogs {
 
     /// Uses ANSI colors instead of colors or emojis when this is true.
     nonisolated(unsafe) public static var useAnsiColors = false
+
+    public static func setColor(_ color: QLColor, for level: QorumLogLevel) {
+        colorsForLogLevels[level.colorIndex] = color
+    }
+
+    public static func color(for level: QorumLogLevel) -> QLColor {
+        colorsForLogLevels[level.colorIndex]
+    }
+
+    public static func resetColorsForLogLevels() {
+        colorsForLogLevels = defaultColorsForLogLevels
+    }
 
     /// Set your function that will get called whenever something new is logged.
     nonisolated(unsafe) public static var trackLogFunction: ((String) -> Void)?

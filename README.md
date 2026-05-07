@@ -168,6 +168,9 @@ You do not need the extension of the file.
 
 Add custom colors for Mac, iOS, tvOS:
 ```swift
+    QorumLogs.setColor(QLColor(r: 255, g: 190, b: 0), for: .warning)
+    QorumLogs.resetColorsForLogLevels()
+
     QorumLogs.colorsForLogLevels[0] = QLColor(r: 255, g: 255, b: 0)
     QorumLogs.colorsForLogLevels[1] = QLColor(red: 255, green: 20, blue: 147)
 ```
