@@ -188,6 +188,11 @@ Add custom colors for Mac, iOS, tvOS:
 
 You only need to set the extraInformation one time.
 
+To include basic device details such as OS version, locale, timezone, model, and simulator/device environment in the Google Docs user information field:
+```swift
+   QorumOnlineLogs.includeDeviceInformation = true
+```
+
 #### KZLinkedConsole support:
 KZLinkedConsole is a plugin for Xcode which add clickable link to place in code from log was printed. All you need to do is install it. For more information go to https://github.com/krzysztofzablocki/KZLinkedConsole  
 

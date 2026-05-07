@@ -141,6 +141,11 @@ public struct QorumOnlineLogs {
     /// Empty dictionary, add extra info like user id, username here.
     nonisolated(unsafe) public static var extraInformation: [String: String] = [:]
 
+    /// Adds basic device information to the Google Docs user information payload.
+    nonisolated(unsafe) public static var includeDeviceInformation = false
+
+    nonisolated(unsafe) static var deviceInformationProvider: () -> [String: String] = defaultDeviceInformation
+
     /// Test to see if it works.
     public static func test() {
         let oldDebugLevel = minimumLogLevelShown
@@ -180,7 +185,7 @@ public struct QorumOnlineLogs {
         }
 
         let versionLevel = "\(appVersion) - \(level)"
-        let userInfo = extraInformation.description
+        let userInfo = userInfoPayload().description
 
         var components = URLComponents()
         components.queryItems = [
@@ -206,6 +211,40 @@ public struct QorumOnlineLogs {
             return false
         }
         return QorumLogs.shouldShowFile(fileName)
+    }
+
+    static func userInfoPayload() -> [String: String] {
+        var payload = includeDeviceInformation ? deviceInformationProvider() : [:]
+        extraInformation.forEach { key, value in
+            payload[key] = value
+        }
+        return payload
+    }
+
+    static func defaultDeviceInformation() -> [String: String] {
+        var info: [String: String] = [
+            "device.osVersion": ProcessInfo.processInfo.operatingSystemVersionString,
+            "device.locale": Locale.current.identifier,
+            "device.timeZone": TimeZone.current.identifier
+        ]
+
+        #if os(macOS)
+        info["device.system"] = "macOS"
+        info["device.model"] = Host.current().localizedName ?? "Mac"
+        #elseif canImport(UIKit)
+        let device = UIDevice.current
+        info["device.system"] = device.systemName
+        info["device.model"] = device.model
+        info["device.name"] = device.name
+        #endif
+
+        #if targetEnvironment(simulator)
+        info["device.environment"] = "simulator"
+        #else
+        info["device.environment"] = "device"
+        #endif
+
+        return info
     }
 }
 
