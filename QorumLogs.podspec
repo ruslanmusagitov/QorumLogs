@@ -10,6 +10,7 @@ s.source           			= { :git => "https://github.com/goktugyil/QorumLogs.git", 
 s.ios.deployment_target 		= "8.0"
 s.tvos.deployment_target 		= "9.0"
 s.osx.deployment_target 		= "10.9"
+s.swift_version 				= "5.5"
 s.requires_arc 				= true
 s.source_files 				= 'QorumLogs.swift'
 

@@ -229,6 +229,11 @@ public func QL4<T>(_ error: T, _ file: String = #fileID, _ function: String = #f
     QLManager(error, file: file, function: function, line: line, level: 4)
 }
 
+/// Generic log entry point for custom wrappers, for example `QLNetwork("request started")`.
+public func QL<T>(_ value: T, level: Int, _ file: String = #fileID, _ function: String = #function, _ line: Int = #line) {
+    QLManager(value, file: file, function: function, line: line, level: level.clamped(to: 1...4))
+}
+
 private func printLog<T>(_ informationPart: String, text: T, level: Int) {
     print(" \(ColorLog.colorizeString(informationPart, colorId: 0))", terminator: "")
     print(" \(ColorLog.colorizeString(text, colorId: level))\n", terminator: "")

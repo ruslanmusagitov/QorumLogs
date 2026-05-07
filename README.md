@@ -164,6 +164,15 @@ You do not need the extension of the file.
 ```
 ![demo](http://i.imgur.com/hQWOYit.png)
 
+#### Custom QL Methods
+
+Create your own short logging wrappers while keeping QorumLogs routing, filtering, and Google Docs behavior:
+```swift
+func QLNetwork<T>(_ value: T) {
+    QL(value, level: 2)
+}
+```
+
 #### Add Custom Colors
 
 Add custom colors for Mac, iOS, tvOS:
